@@ -1,30 +1,30 @@
 spring:
-    application:
-        name: report-listener
-    profiles:
-      default: default
-    cloud:
-      stream:
-        Kafka:
-          binder:
-            brokers: localhost:9092
-        function:
-          bindings:
-            consumerReport-in-O: # consumerReport-out ->consumerReport <-consumerReport-in
-              destination: consumerReport
-    data:
-      mongodb:
-        authentication-database: admin
-        host: localhost
-        port: 27017
-        username: sa
-        password: sa
+  application:
+    name: report-listener
+  profiles:
+    default: default
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost:9092}
+      bindings:
+        consumerReport-in-0:
+          destination: consumerReport
+  mongodb:
+    authentication-database: ${MONGO_AUTH_DB:admin}
+    host: ${MONGO_HOST:localhost}
+    port: ${MONGO_PORT:27017}
+    database: ${MONGO_DB:reportdb}
+    username: ${MONGO_USER:sa}
+    password: ${MONGO_PASS:sa}
 
-    server:
-      port: 0
-    eureka:
-      instance:
-        instance-id: "${spring.application.name}:${server.port}:${random.value}"
-      client:
-        service-url:
-          defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka/}
+server:
+  port: 0
+
+eureka:
+  instance:
+    instance-id: "${spring.application.name}:${server.port}:${random.value}"
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka/}

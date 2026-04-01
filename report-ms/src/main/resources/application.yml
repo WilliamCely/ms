@@ -5,14 +5,13 @@ spring:
     default: default
   config:
     import: "optional:configserver:http://localhost:7777"
-cloud:
-  stream:
-    Kafka:
-      binder:
-        brokers: localhost:9092
-    function:
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost:9092}
       bindings:
-        consumerReport-out-O: # consumerReport-out ->consumerReport <-consumerReport-in
+        consumerReport-out-0:
           destination: consumerReport
 
 server:

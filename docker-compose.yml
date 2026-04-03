@@ -1,5 +1,3 @@
-version: '29.2.1'
-
 services:
 
     db:
@@ -122,3 +120,61 @@ services:
       restart: always
       ports:
         - "9411:9411"
+
+    ms-registry-server:
+      image: ms-registry-server:latest
+      container_name: ms-registry-server
+      restart: always
+      ports:
+        - "8761:8761"
+
+    ms-config-server:
+      image: ms-config-server:latest
+      build:
+        context: ./config-server
+      container_name: ms-config-server
+      restart: always
+      ports:
+        - "7777:7777"
+      depends_on:
+        - ms-registry-server
+      environment:
+        EUREKA_DEFAULT_ZONE: http://ms-registry-server:8761/eureka/
+
+    ms-companies-crud:
+      image: ms-companies-crud:latest
+      build:
+        context: ./companies-crud
+      container_name: ms-companies-crud
+      restart: always
+      ports:
+        - "8081:8081"
+      depends_on:
+        - ms-config-server
+        - db
+        - otel-collector
+      environment:
+        SPRING_PROFILES_ACTIVE: default
+        SPRING_DATASOURCE_URL: jdbc:postgresql://db-companies:5432/companies
+        SPRING_DATASOURCE_USERNAME: admin
+        SPRING_DATASOURCE_PASSWORD: pass348
+        EUREKA_DEFAULT_ZONE: http://ms-registry-server:8761/eureka/
+        CONFIG_SERVER_HOST: http://ms-config-server:7777
+        OTLP_METRICS_URL: http://otel-collector:4318/v1/metrics
+        OTLP_TRACING_URL: http://otel-collector:4318/v1/traces
+
+    ms-companies-crud-fallback:
+      image: ms-companies-crud-fallback:latest
+      build:
+        context: ./companies-crud-fallback
+      container_name: ms-companies-crud-fallback
+      restart: always
+      ports:
+        - "8787:8787"
+      depends_on:
+        - ms-config-server
+      environment:
+        EUREKA_DEFAULT_ZONE: http://ms-registry-server:8761/eureka/      
+
+          
+

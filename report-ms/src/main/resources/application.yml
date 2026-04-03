@@ -4,12 +4,12 @@ spring:
   profiles:
     default: default
   config:
-    import: "optional:configserver:http://localhost:7777"
+    import: "optional:configserver:${CONFIG_SERVER_HOST:http://ms-config-server:7777}"
   cloud:
     stream:
       kafka:
         binder:
-          brokers: ${KAFKA_BROKER:localhost:9092}
+          brokers: ${BROKER_URL:kafka:29092}
       bindings:
         consumerReport-out-0:
           destination: consumerReport
@@ -25,9 +25,9 @@ eureka:
     enabled: true
     register-with-eureka: true
     fetch-registry: true
-    service-url:
-      defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka/}
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_ZONE:http://ms-registry-server:8761/eureka/}
 
 fallback:
-  uri: ${FALLBACK_URI:http://companies-crud/companies-crud/company/{name}}
+  uri: ${FALLBACK_URI:http://ms-companies-crud-fallback:8787/companies-crud-fallback/company/{name}}
 

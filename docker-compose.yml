@@ -34,7 +34,9 @@ services:
         KAFKA_BROKER_ID: 1
         KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
         KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+        KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
         KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
         KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -174,7 +176,24 @@ services:
       depends_on:
         - ms-config-server
       environment:
-        EUREKA_DEFAULT_ZONE: http://ms-registry-server:8761/eureka/      
+        EUREKA_DEFAULT_ZONE: http://ms-registry-server:8761/eureka/   
+
+    ms-report-ms:
+      image: ms-report-ms:latest
+      build:
+        context: ./report-ms
+      container_name: ms-report-ms
+      restart: always
+      ports:
+        - "7071:7071"
+      depends_on:
+        - ms-config-server
+        - kafka
+      environment:
+        EUREKA_DEFAULT_ZONE: http://ms-registry-server:8761/eureka/
+        CONFIG_SERVER_HOST: http://ms-config-server:7777
+        BROKER_URL: kafka:29092
+
 
           
 

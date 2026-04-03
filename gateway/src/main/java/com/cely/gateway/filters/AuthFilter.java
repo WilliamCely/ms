@@ -1,6 +1,7 @@
 package com.cely.gateway.filters;
 
 import com.cely.gateway.dtos.TokenDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +16,8 @@ import reactor.core.publisher.Mono;
 public class AuthFilter implements GatewayFilter {
 
     private final WebClient webClient;
-    private static final String AUTH_VALIDATE_URI = "http://localhost:3031/auth-server/auth/jwt";
+    @Value("${AUTH_VALIDATE_URI:http://ms-auth-server:3031/auth-server/auth/jwt}")
+    private String authValidateUri;
     private static final String ACCESS_TOKEN_HEADER_NAME = "accessToken";
 
     public AuthFilter(){
@@ -43,7 +45,7 @@ public class AuthFilter implements GatewayFilter {
 
         return webClient
                 .post()
-                .uri(AUTH_VALIDATE_URI)
+            .uri(authValidateUri)
                 .header(ACCESS_TOKEN_HEADER_NAME, token)
                 .retrieve()
                 .bodyToMono(TokenDto.class)

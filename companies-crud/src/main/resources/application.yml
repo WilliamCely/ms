@@ -16,7 +16,7 @@ spring:
 server:
   servlet:
     context-path: /companies-crud
-  port: 8081
+  port: 0
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
